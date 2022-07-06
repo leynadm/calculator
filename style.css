@@ -4,6 +4,7 @@
 }
 
 .calculator{
+    width: 375px;
     display: flex;
     flex-direction: column;
 }
@@ -18,12 +19,14 @@
     display: flex;
     justify-content: right;
     align-items:center;
-    width: 200px;
-    height: 50px;
+    height: 75px;
     border-style: solid;
+    font-size: 40px;
 }
 
 .key{
+    padding: 1rem;
+    margin: 4px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -31,4 +34,23 @@
     border: 1px;
     width: 50px;
     height: 60px;
+    font-size: 40px;
+    border-radius: 16px;
+}
+
+
+.key.number{
+    background-color: darkgoldenrod;
+}
+
+.key.operator{
+    background-color: orange;
+}
+
+.key.equal{
+    background-color: yellow;
+}
+
+.key:hover{
+    background-color:deeppink;
 }
