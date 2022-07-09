@@ -10,8 +10,9 @@ let firstNumberAdded = '';
 let secondNumberAdded = '';
 let resultNumbers;
 let operatorChosen;
-console.log(operatorChosen)
-
+let previousOperator;
+console.log(firstNumberAdded);
+console.log(secondNumberAdded);
 // Add event listener to the operator keys
 for (let i = 0; i < operatorKeys.length; i++){
     operatorKeys[i].addEventListener('click',recordOperatorPress,false)
@@ -26,50 +27,69 @@ for (let i = 0; i < numberKeys.length; i++){
 btnEqual.addEventListener('click',recordEqualPress);
 
 // Add unique event listener to the clear key
-btnEqual.addEventListener('click',clearNumbers);
+btnC.addEventListener('click',clearNumbers);
+
+function recordNumberPress(e){
+
+    if (firstNumberAdded == ''){
+        if (firstNumberAdded != isFinite(resultNumbers)){
+            firstNumberAdded = 0;
+        }
+        firstNumberAdded = firstNumberAdded + e.target.textContent;
+        inputBar.textContent = firstNumberAdded;
+        console.log('first number: ' + firstNumberAdded);
+    } else {
+        secondNumberAdded = secondNumberAdded + e.target.textContent;
+        inputBar.textContent = secondNumberAdded;
+        console.log('second number: ' + secondNumberAdded);
+    }
+}
 
 function recordOperatorPress(e){
+    
     operatorChosen = e.target.textContent;
-    console.log(operatorChosen);
-    if (firstNumberAdded != '' && secondNumberAdded != ''){
-        let result = operate(firstNumberAdded,secondNumberAdded,operatorChosen)
-        inputBar.textContent = result;
+
+    if (firstNumberAdded != '' && secondNumberAdded != '' && previousOperator != null){
+        let result = operate(firstNumberAdded,secondNumberAdded,previousOperator)    
+        displayResult(result);
+        console.log('logging result now: '+ result);
         firstNumberAdded = result;
         secondNumberAdded = '';
+        
+    } else if (firstNumberAdded != '' && secondNumberAdded != '') {
+        
+        let result = operate(firstNumberAdded,secondNumberAdded,operatorChosen)
+        displayResult(result)
+        console.log('logging result now: '+ result);
+        firstNumberAdded = result;
+        secondNumberAdded = '';
+        operatorChosen = '';
     
     }
 
+    previousOperator = operatorChosen;
 }
 
-function checkInfinity(resultValue){
-    if (resultValue== Infinity){
-        inputBar.textContent = "Are you trying to break math?"
-    } else {
+
+function displayResult(resultValue){
+    if (isFinite(resultValue)){
         inputBar.textContent = resultValue;
+    } else {
+        inputBar.textContent = "Don't break math...?"
+
     }
 }
 
 function recordEqualPress(e){
+    if (firstNumberAdded != '' && secondNumberAdded != ''){
     inputBar.textContent = inputBar.textContent + e.target.textContent;
     let result = operate(firstNumberAdded,secondNumberAdded,operatorChosen);
-    inputBar.textContent = result;
+    displayResult(result);
     firstNumberAdded = result;
     secondNumberAdded = '';
-
 }
-
-function recordNumberPress(e){
-    if (operatorChosen == null){
-        firstNumberAdded = firstNumberAdded + e.target.textContent;
-        inputBar.textContent = firstNumberAdded;
-    } else {
-        secondNumberAdded = secondNumberAdded + e.target.textContent;
-        inputBar.textContent = secondNumberAdded;
-
-    }    
 }
-
-
+    
 function operate (firstNumber, secondNumber, operator){
 
     let result;
@@ -110,7 +130,9 @@ function division(a,b){
     return result;
 }
 
-function clear(){
+
+function clearNumbers(){
     firstNumberAdded = '';
     secondNumberAdded = '';
+    inputBar.textContent = 0;
 }
