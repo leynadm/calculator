@@ -4,7 +4,7 @@ let operatorKeys = document.querySelectorAll(".operator")
 let inputBar = document.querySelector(".input-bar")
 let btnC = document.querySelector("#clear");
 let btnEqual = document.querySelector("#equal");
-let btnDot = document.querySelector('#dot');
+let btnFix = document.querySelector('#fix');
 
 // Global variables to store the numbers we want to calculate;
 let firstNumberAdded = '';
@@ -13,9 +13,8 @@ let resultNumbers;
 let operatorChosen;
 let previousOperator;
 let saveFirstNumber;
+let temporaryNumber;
 
-console.log(firstNumberAdded);
-console.log(secondNumberAdded);
 // Add event listener to the operator keys
 for (let i = 0; i < operatorKeys.length; i++){
     operatorKeys[i].addEventListener('click',recordOperatorPress,false)
@@ -32,23 +31,31 @@ btnEqual.addEventListener('click',recordEqualPress);
 // Add unique event listener to the clear key
 btnC.addEventListener('click',clearNumbers);
 
-// Add unique event listener to the clear key
-//btnDot.addEventListener('click',addDot);
+// Add unique event listener to the fix key
+btnFix.addEventListener('click',undoError);
 
 function recordNumberPress(e){
 
     let numberPressed = e.target.textContent;
-    
-    if (checkDotStatus(numberPressed) == "ALREADY"){
-        return;
-    }
+    if (operatorChosen == null){   
+        if (checkDotStatus(numberPressed) == "ALREADY"){
+            return;
+        }
+        if (firstNumberAdded.length > 17){
+            return;
+        }
 
-    if (operatorChosen == null){
-        
         firstNumberAdded = firstNumberAdded + e.target.textContent;
         inputBar.textContent = firstNumberAdded;
         console.log('first number: ' + firstNumberAdded);
+
     } else {
+        if (checkDotStatus(numberPressed) == "ALREADY"){
+            return;
+        }
+        if (secondNumberAdded.length > 17){
+            return;
+        }
         secondNumberAdded = secondNumberAdded + e.target.textContent;
         inputBar.textContent = secondNumberAdded;
         console.log('second number: ' + secondNumberAdded);
@@ -58,8 +65,9 @@ function recordNumberPress(e){
 function checkDotStatus(keyPressed){
 
     let inputBarText = inputBar.textContent;
-
     if (keyPressed == "." && inputBarText.includes('.')){
+        return "ALREADY";
+    } else if (keyPressed == "." && inputBarText == ''){
         return "ALREADY";
     }
 }
@@ -67,31 +75,26 @@ function checkDotStatus(keyPressed){
 function recordOperatorPress(e){
     
     operatorChosen = e.target.textContent;
-
     if (firstNumberAdded != '' && secondNumberAdded != '' && previousOperator != null){
         let result = operate(firstNumberAdded,secondNumberAdded,previousOperator)    
         displayResult(result);
-        console.log('logging result now: '+ result);
         firstNumberAdded = result;
         secondNumberAdded = '';
-        
     } else if (firstNumberAdded != '' && secondNumberAdded != '') {
-        
         let result = operate(firstNumberAdded,secondNumberAdded,operatorChosen)
         displayResult(result)
-        console.log('logging result now: '+ result);
         firstNumberAdded = result;
         secondNumberAdded = '';
         operatorChosen = '';
-    
     }
-
     previousOperator = operatorChosen;
+    console.log("first number is: " + firstNumberAdded);
+    console.log("second number is: " + secondNumberAdded);
 }
 
 function displayResult(resultValue){
     if (isFinite(resultValue)){
-        inputBar.textContent = resultValue;
+        inputBar.textContent = Math.round(resultValue*10000000)/10000000;
     } else {
         inputBar.textContent = "Don't break math...?"
     }
@@ -104,13 +107,38 @@ function recordEqualPress(e){
     displayResult(result);
     firstNumberAdded = result;
     secondNumberAdded = '';
+    }
 }
+
+function clearNumbers(){
+    firstNumberAdded = '';
+    secondNumberAdded = '';
+    inputBar.textContent = '';
+    operatorChosen = null;
 }
+
+function undoError(e){
+
+    let inputBarText = inputBar.textContent;
     
+    if (inputBarText > 0){
+    
+        let inputBarTextString = inputBarText.toString().slice(0,inputBarText.toString().length -1);
+    
+        if (firstNumberAdded != '' && operatorChosen == null){
+            firstNumberAdded = inputBarTextString;
+            inputBar.textContent = inputBarTextString;
+        } else if (secondNumberAdded != '' && operatorChosen != null){
+            secondNumberAdded = inputBarTextString;
+            inputBar.textContent = inputBarTextString;
+        }
+    }
+    
+}
+
 function operate (firstNumber, secondNumber, operator){
 
     let result;
-    console.log(operator)
     if (operator == "+"){
         result = addition(firstNumber,secondNumber);
         return result;
@@ -145,11 +173,4 @@ function division(a,b){
     let result = parseFloat(a) / parseFloat(b);
     console.log('division result: ' + result)
     return result;
-}
-
-
-function clearNumbers(){
-    firstNumberAdded = '';
-    secondNumberAdded = '';
-    inputBar.textContent = 0;
 }
