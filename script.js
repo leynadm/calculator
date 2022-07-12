@@ -4,6 +4,7 @@ let operatorKeys = document.querySelectorAll(".operator")
 let inputBar = document.querySelector(".input-bar")
 let btnC = document.querySelector("#clear");
 let btnEqual = document.querySelector("#equal");
+let btnDot = document.querySelector('#dot');
 
 // Global variables to store the numbers we want to calculate;
 let firstNumberAdded = '';
@@ -11,6 +12,8 @@ let secondNumberAdded = '';
 let resultNumbers;
 let operatorChosen;
 let previousOperator;
+let saveFirstNumber;
+
 console.log(firstNumberAdded);
 console.log(secondNumberAdded);
 // Add event listener to the operator keys
@@ -29,12 +32,19 @@ btnEqual.addEventListener('click',recordEqualPress);
 // Add unique event listener to the clear key
 btnC.addEventListener('click',clearNumbers);
 
+// Add unique event listener to the clear key
+//btnDot.addEventListener('click',addDot);
+
 function recordNumberPress(e){
 
-    if (firstNumberAdded == ''){
-        if (firstNumberAdded != isFinite(resultNumbers)){
-            firstNumberAdded = 0;
-        }
+    let numberPressed = e.target.textContent;
+    
+    if (checkDotStatus(numberPressed) == "ALREADY"){
+        return;
+    }
+
+    if (operatorChosen == null){
+        
         firstNumberAdded = firstNumberAdded + e.target.textContent;
         inputBar.textContent = firstNumberAdded;
         console.log('first number: ' + firstNumberAdded);
@@ -42,6 +52,15 @@ function recordNumberPress(e){
         secondNumberAdded = secondNumberAdded + e.target.textContent;
         inputBar.textContent = secondNumberAdded;
         console.log('second number: ' + secondNumberAdded);
+    }
+}
+
+function checkDotStatus(keyPressed){
+
+    let inputBarText = inputBar.textContent;
+
+    if (keyPressed == "." && inputBarText.includes('.')){
+        return "ALREADY";
     }
 }
 
@@ -70,13 +89,11 @@ function recordOperatorPress(e){
     previousOperator = operatorChosen;
 }
 
-
 function displayResult(resultValue){
     if (isFinite(resultValue)){
         inputBar.textContent = resultValue;
     } else {
         inputBar.textContent = "Don't break math...?"
-
     }
 }
 
@@ -110,22 +127,22 @@ function operate (firstNumber, secondNumber, operator){
 }
 
 function addition(a,b){
-    let result = parseInt(a)+parseInt(b);
+    let result = parseFloat(a)+parseFloat(b);
     return result;
 }
 
 function subtraction(a,b){
-    let result = parseInt(a)-parseInt(b);
+    let result = parseFloat(a)-parseFloat(b);
     return result;
 }
 
 function multiplication(a,b){
-    let result = parseInt(a)*parseInt(b);
+    let result = parseFloat(a)*parseFloat(b);
     return result;
 }
 
 function division(a,b){
-    let result = parseInt(a) / parseInt(b);
+    let result = parseFloat(a) / parseFloat(b);
     console.log('division result: ' + result)
     return result;
 }
